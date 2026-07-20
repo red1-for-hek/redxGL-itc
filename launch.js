@@ -64,10 +64,16 @@
     bindOption(a);
   }
 
-  $('step-2').onclick = function() {
+  beginGame = function() {
+    $('step-1').style.display = 'none';
     $('step-2').style.display = 'none';
     $('step-3').style.display = 'block';
+    $('step-3').style.backgroundImage = "url(css/help-" + s[0][3] + ".png)";
     return init(s[0][3], s[1][3], s[2][3], s[3][3]);
+  };
+
+  $('step-2').onclick = function() {
+    return beginGame();
   };
 
   $('step-5').onclick = function() {
@@ -107,9 +113,7 @@
     };
   } else {
     $('start').onclick = function() {
-      $('step-1').style.display = 'none';
-      $('step-2').style.display = 'block';
-      return $('step-2').style.backgroundImage = "url(css/help-" + s[0][3] + ".png)";
+      return beginGame();
     };
   }
 
