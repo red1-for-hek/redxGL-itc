@@ -31,7 +31,16 @@ bkcore.Audio.addSound = function(src, id, loop, callback, usePanner){
 	var audio = new Audio();
 	
 	if(ctx){
-		var audio = { src: null, gainNode: null, bufferNode: null, loop: loop };
+		var audio = { src: null, gainNode: null, bufferNode: null, loop: loop, fallback: null, useFallback: false };
+		var failOpen = function(reason){
+			console.warn('Audio load fallback for %s.'.replace('%s', id), reason || '');
+			audio.fallback = new Audio();
+			audio.fallback.loop = loop;
+			audio.fallback.autoplay = false;
+			audio.fallback.src = src;
+			audio.useFallback = true;
+			callback();
+		};
 		var xhr = new XMLHttpRequest();
 		xhr.responseType = 'arraybuffer';
 
@@ -56,7 +65,13 @@ bkcore.Audio.addSound = function(src, id, loop, callback, usePanner){
 				callback();
 			}, function(e){
 				console.error('Audio decode failed!', e);
+				failOpen(e);
 			});
+		};
+
+		xhr.onerror = function(e){
+			console.error('Audio request failed!', e);
+			failOpen(e);
 		};
 
 		xhr.open('GET', src, true);
@@ -82,8 +97,13 @@ bkcore.Audio.addSound = function(src, id, loop, callback, usePanner){
 bkcore.Audio.play = function(id){
 	var ctx = bkcore.Audio._ctx;
 	bkcore.Audio.resume();
+	var sound = bkcore.Audio.sounds[id];
 
-	if(ctx){
+	if(sound == null){
+		return;
+	}
+
+	if(ctx && sound.useFallback !== true && sound.gainNode != null && sound.src != null){
 		var sound = ctx.createBufferSource();
 		sound.connect(bkcore.Audio.sounds[id].gainNode);
 		
@@ -95,13 +115,21 @@ bkcore.Audio.play = function(id){
 
 		sound.start ? sound.start(0) : sound.noteOn(0);
 	}
-	else {
-		if(bkcore.Audio.sounds[id].currentTime > 0){
-			bkcore.Audio.sounds[id].pause();
-			bkcore.Audio.sounds[id].currentTime = 0;
+	else if(sound.fallback != null){
+		if(sound.fallback.currentTime > 0){
+			sound.fallback.pause();
+			sound.fallback.currentTime = 0;
 		}
 
-		bkcore.Audio.sounds[id].play();
+		sound.fallback.play();
+	}
+	else {
+		if(sound.currentTime > 0){
+			sound.pause();
+			sound.currentTime = 0;
+		}
+
+		sound.play();
 	}
 };
 
@@ -112,6 +140,10 @@ bkcore.Audio.stop = function(id){
 		if(bkcore.Audio.sounds[id].bufferNode !== null){
 			var bufferNode = bkcore.Audio.sounds[id].bufferNode;
 			bufferNode.stop ? bufferNode.stop(ctx.currentTime) : bufferNode.noteOff(ctx.currentTime);
+		}
+		else if(bkcore.Audio.sounds[id].fallback != null){
+			bkcore.Audio.sounds[id].fallback.pause();
+			bkcore.Audio.sounds[id].fallback.currentTime = 0;
 		}
 	}
 	else {
@@ -124,7 +156,12 @@ bkcore.Audio.volume = function(id, volume){
 	var ctx = bkcore.Audio._ctx;
 
 	if(ctx){
-		bkcore.Audio.sounds[id].gainNode.gain.value = volume;
+		if(bkcore.Audio.sounds[id].gainNode != null){
+			bkcore.Audio.sounds[id].gainNode.gain.value = volume;
+		}
+		else if(bkcore.Audio.sounds[id].fallback != null){
+			bkcore.Audio.sounds[id].fallback.volume = volume;
+		}
 	}
 	else {
 		bkcore.Audio.sounds[id].volume = volume;
