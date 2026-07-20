@@ -192,6 +192,30 @@ html, body {
   background: black;
 }
 
+#loading-brand {
+  position: absolute;
+  top: 18%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: #fff;
+  text-shadow: 0 0 24px rgba(255,255,255,0.2);
+  z-index: 2;
+  pointer-events: none;
+}
+
+#loading-title {
+  font-size: 4.5em;
+  letter-spacing: 0.06em;
+  color: #f66439;
+}
+
+#loading-subtitle {
+  margin-top: -0.35em;
+  font-size: 1.8em;
+  color: #d7f2ff;
+}
+
 #step-3 #progressbar {
   position: absolute;
   top: 0;
@@ -200,6 +224,7 @@ html, body {
   left: 0;
   width: 0%;
   background: white;
+  z-index: 1;
 }
 
 #step-5 {

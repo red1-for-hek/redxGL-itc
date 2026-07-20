@@ -1,10 +1,10 @@
-HexGL
+RedxGL
 =========
 
-Source code of [HexGL](http://hexgl.bkcore.com), the futuristic HTML5 racing game by [Thibaut Despoulain](http://bkcore.com)
+Source code of [RedxGL](https://red1-for-hek.github.io/redxGL-itc/), the futuristic HTML5 racing game by Redoyanul.
 
 ## Branches
-  * **[Master](https://github.com/BKcore/HexGL)** - Public release (stable).
+	* **[Main](https://github.com/red1-for-hek/redxGL-itc)** - Public release (stable).
 
 ## License
 
