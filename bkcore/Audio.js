@@ -16,6 +16,14 @@ bkcore.Audio.init = function(){
 	bkcore.Audio.posMultipler = 1.5;
 };
 
+bkcore.Audio.resume = function(){
+	var ctx = bkcore.Audio._ctx;
+
+	if(ctx && ctx.state === 'suspended' && typeof ctx.resume === 'function'){
+		ctx.resume();
+	}
+};
+
 bkcore.Audio.init();
 
 bkcore.Audio.addSound = function(src, id, loop, callback, usePanner){
@@ -73,6 +81,7 @@ bkcore.Audio.addSound = function(src, id, loop, callback, usePanner){
 
 bkcore.Audio.play = function(id){
 	var ctx = bkcore.Audio._ctx;
+	bkcore.Audio.resume();
 
 	if(ctx){
 		var sound = ctx.createBufferSource();

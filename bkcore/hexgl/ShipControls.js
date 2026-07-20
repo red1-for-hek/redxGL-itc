@@ -459,6 +459,7 @@ bkcore.hexgl.ShipControls.prototype.update = function(dt)
 
 	this.speed = Math.max(0.0, Math.min(this.speed, this.maxSpeed));
 	this.speedRatio = this.speed / this.maxSpeed;
+	bkcore.Audio.volume('wind', Math.min(0.8, 0.12 + (this.speedRatio * 0.55) + (this.key.forward ? 0.08 : 0)));
 	this.movement.z += this.speed * dt;
 
 	if(this.repulsionForce.isZero())
